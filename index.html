@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>মিউটেশন আবেদন</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <header class="bg-green-700 text-white p-4 text-center text-xl font-bold">
+    ভূমি মিউটেশন সেবা (ডেমো)
+  </header>
+
+  <main class="p-4 max-w-3xl mx-auto">
+    <section class="bg-white shadow-md rounded p-6 mt-6">
+      <h2 class="text-2xl font-semibold mb-4">অনলাইন মিউটেশন আবেদন</h2>
+      <form id="mutationForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium">পূর্ণ নাম</label>
+          <input type="text" name="fullname" class="w-full border rounded px-3 py-2" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">ঠিকানা</label>
+          <input type="text" name="address" class="w-full border rounded px-3 py-2" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">মৌজা নাম</label>
+          <input type="text" name="mouza" class="w-full border rounded px-3 py-2" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">জেএল নাম্বার</label>
+          <input type="number" name="jlno" class="w-full border rounded px-3 py-2" required />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">মোবাইল নাম্বার</label>
+          <input type="tel" name="mobile" class="w-full border rounded px-3 py-2" required />
+        </div>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+          আবেদন জমা দিন
+        </button>
+      </form>
+    </section>
+
+    <section class="bg-white shadow-md rounded p-6 mt-6">
+      <h2 class="text-2xl font-semibold mb-4">খতিয়ান ডাউনলোড</h2>
+      <button id="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+        খতিয়ান PDF ডাউনলোড করুন
+      </button>
+    </section>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-demo-key",
+      authDomain: "mutation-demo.firebaseapp.com",
+      projectId: "mutation-demo",
+      storageBucket: "mutation-demo.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.getElementById('mutationForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const data = {
+        fullname: e.target.fullname.value,
+        address: e.target.address.value,
+        mouza: e.target.mouza.value,
+        jlno: e.target.jlno.value,
+        mobile: e.target.mobile.value
+      };
+
+      try {
+        await db.collection("applications").add(data);
+        alert('✅ আপনার আবেদন সফলভাবে সংরক্ষণ হয়েছে!');
+        e.target.reset();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert('❌ কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।');
+      }
+    });
+
+    document.getElementById('downloadPDF').addEventListener('click', () => {
+      const jsPDF = window.jspdf.jsPDF;
+      const doc = new jsPDF();
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("ভূমি মিউটেশন খতিয়ান", 20, 20);
+
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text("নাম: জন ডেমো", 20, 40);
+      doc.text("ঠিকানা: ১২৩/এ, পরীক্ষার রাস্তা, ঢাকা", 20, 50);
+      doc.text("মৌজা: রমনা", 20, 60);
+      doc.text("জেএল নাম্বার: ৪৫৬", 20, 70);
+      doc.text("মোবাইল: ০১৭xxxxxxxx", 20, 80);
+
+      doc.save("khatiyan.pdf");
+    });
+  </script>
+</body>
+</html>
